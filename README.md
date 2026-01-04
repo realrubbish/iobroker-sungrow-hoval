@@ -1,7 +1,7 @@
 # iobroker
 Power Management with Sungrow PV Inverter, Hoval Heat Pump &amp; Shelly Meter &amp; Switches
 
-![ioBroker Overview](img/iobroker_overview.drawio.png)
+![ioBroker Overview](img/Overview_toby.drawio.svg)
 
 ## PV system
   - Inverter: Sungrow SH20T with 3 MPP-Trackers
