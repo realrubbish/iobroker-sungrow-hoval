@@ -58,3 +58,8 @@ In [HovalSmartGrid.pdf](img/HovalSmartGrid.pdf) it's described how to combine th
 > But nothing happens when I set the Ausloeser_Smart_Grid_Funktion to `2` (= Systembus) and Smart_Grid_ueber_Systembus to `1`, `2` or `3`. The  
 >
 > If you managed to solve this problem please let me know.
+
+## Scripts
+Source of the ioBroker javascript.0 scripts that are kept in Git (copy into the javascript adapter, folder = path below `scripts/`):
+
+- [Relays/Huehnerlicht.js](scripts/Relays/Huehnerlicht.js) – chicken coop light (`1PM-1` Shelly). From October 1 to March 31: on 30 min before until 60 min after sunrise and 60 min before until 60 min after sunset, recalculated daily from the coordinates in `system.config`. Publishes the plan to `0_userdata.0.Huehnerlicht.*`; `automatik` = `false` disables the schedule. Manual switching sticks until the next window boundary.
