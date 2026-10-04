@@ -10,6 +10,8 @@ const relaisId = `shelly.0.shelly1pmmini#${SHELLY_MAC}#1.Relay0.Switch`;
 const base = '0_userdata.0.Huehnerlicht.';
 const automatikId = base + 'automatik';
 const saisonId = base + 'saison';
+const naechsterWechselId = base + 'naechster_wechsel';
+const naechsterZustandId = base + 'naechster_zustand';
 
 const MORGEN_EIN_MIN = -30;
 const MORGEN_AUS_MIN = 60;
@@ -38,9 +40,9 @@ function hhmm(date) {
     return formatDate(date, 'hh:mm');
 }
 
-function tagesplan(now) {
+function tagesplan(now, tageVoraus = 0) {
     // Mittag als Bezug, damit getAstroDate sicher die Zeiten dieses Kalendertags liefert.
-    const mittag = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12, 0, 0);
+    const mittag = new Date(now.getFullYear(), now.getMonth(), now.getDate() + tageVoraus, 12, 0, 0);
     const aufgang = getAstroDate('sunrise', mittag);
     const untergang = getAstroDate('sunset', mittag);
     return {
@@ -58,15 +60,35 @@ function sollwert(now, plan) {
     return (now >= plan.morgen_ein && now < plan.morgen_aus) || (now >= plan.abend_ein && now < plan.abend_aus);
 }
 
+// Nächste Fenstergrenze ab jetzt, auch über Tage hinweg (ausserhalb der Saison: erster Morgen im Oktober).
+function naechsterWechsel(now) {
+    for (let tag = 0; tag <= 366; tag++) {
+        const datum = new Date(now.getFullYear(), now.getMonth(), now.getDate() + tag, 12, 0, 0);
+        if (!istSaison(datum)) {
+            continue;
+        }
+        const plan = tagesplan(now, tag);
+        const grenzen = [[plan.morgen_ein, true], [plan.morgen_aus, false], [plan.abend_ein, true], [plan.abend_aus, false]];
+        const naechste = grenzen.find(([zeit]) => zeit > now);
+        if (naechste) {
+            return { zeit: naechste[0], ein: naechste[1] };
+        }
+    }
+    return null;
+}
+
 function aktualisieren(erzwingen) {
     const now = new Date();
     const plan = tagesplan(now);
     const saison = istSaison(now);
 
-    setState(saisonId, saison, true);
+    setStateChanged(saisonId, saison, true);
     for (const key of Object.keys(zeitStates)) {
-        setState(base + key, hhmm(plan[key]), true);
+        setStateChanged(base + key, hhmm(plan[key]), true);
     }
+    const naechster = naechsterWechsel(now);
+    setStateChanged(naechsterWechselId, naechster ? naechster.zeit.getTime() : 0, true);
+    setStateChanged(naechsterZustandId, naechster ? naechster.ein : false, true);
 
     const soll = sollwert(now, plan);
     const wechsel = letzterSollwert !== null && soll !== letzterSollwert;
@@ -88,6 +110,8 @@ function aktualisieren(erzwingen) {
 async function init() {
     await createStateAsync(automatikId, true, { name: 'Hühnerlicht Automatik', type: 'boolean', role: 'switch', read: true, write: true });
     await createStateAsync(saisonId, false, { name: 'Hühnerlicht Saison aktiv (1.10.–31.3.)', type: 'boolean', role: 'indicator', read: true, write: false });
+    await createStateAsync(naechsterWechselId, 0, { name: 'Hühnerlicht nächste Schaltung (Zeitpunkt)', type: 'number', role: 'value.time', read: true, write: false });
+    await createStateAsync(naechsterZustandId, false, { name: 'Hühnerlicht nächste Schaltung (true = EIN)', type: 'boolean', role: 'indicator', read: true, write: false });
     for (const [key, name] of Object.entries(zeitStates)) {
         await createStateAsync(base + key, '', { name: 'Hühnerlicht ' + name, type: 'string', role: 'text', read: true, write: false });
     }

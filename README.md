@@ -62,4 +62,4 @@ In [HovalSmartGrid.pdf](img/HovalSmartGrid.pdf) it's described how to combine th
 ## Scripts
 Source of the ioBroker javascript.0 scripts that are kept in Git (copy into the javascript adapter, folder = path below `scripts/`):
 
-- [Relays/Huehnerlicht.js](scripts/Relays/Huehnerlicht.js) – chicken coop light (`1PM-1` Shelly). From October 1 to March 31: on 30 min before until 60 min after sunrise and 60 min before until 60 min after sunset, recalculated daily from the coordinates in `system.config`. Publishes the plan to `0_userdata.0.Huehnerlicht.*`; `automatik` = `false` disables the schedule. Manual switching sticks until the next window boundary.
+- [Relays/Huehnerlicht.js](scripts/Relays/Huehnerlicht.js) – chicken coop light (`1PM-1` Shelly). From October 1 to March 31: on 30 min before until 60 min after sunrise and 60 min before until 60 min after sunset, recalculated daily from the coordinates in `system.config`. Publishes the plan and the next switch (`naechster_wechsel` as epoch ms, `naechster_zustand` = `true` for on) to `0_userdata.0.Huehnerlicht.*`; `automatik` = `false` disables the schedule. Manual switching sticks until the next window boundary.
