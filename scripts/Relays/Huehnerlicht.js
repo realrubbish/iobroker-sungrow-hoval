@@ -4,9 +4,9 @@
 // Die Zeiten werden jeden Tag aus Sonnenauf-/-untergang (Koordinaten aus system.config) neu berechnet.
 // Geschaltet wird nur an den Fenstergrenzen: wer zwischendurch von Hand (Homescreen, Admin) schaltet,
 // behält diesen Zustand bis zur nächsten Grenze.
-// MAC des eigenen Shelly 1PM Mini (Kleinbuchstaben, ohne Doppelpunkte), siehe Objekt-ID unter shelly.0
+// MAC des eigenen Shelly 1PM Mini Gen3 (Kleinbuchstaben, ohne Doppelpunkte), siehe Objekt-ID unter shelly.0
 const SHELLY_MAC = 'xxxxxxxxxxxx';
-const relaisId = `shelly.0.shelly1pmmini#${SHELLY_MAC}#1.Relay0.Switch`;
+const relaisId = `shelly.0.shelly1pmminig3#${SHELLY_MAC}#1.Relay0.Switch`;
 const base = '0_userdata.0.Huehnerlicht.';
 const automatikId = base + 'automatik';
 const saisonId = base + 'saison';
